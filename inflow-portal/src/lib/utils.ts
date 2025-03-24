@@ -140,7 +140,7 @@ export function convertToUIMessages(
 
     // Build the text content and tool invocations from message.content.
     let textContent = ''
-    let toolInvocations: Array<ToolInvocation> = []
+    const toolInvocations: Array<ToolInvocation> = []
 
     if (message.content) {
       if (typeof message.content === 'string') {

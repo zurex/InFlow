@@ -4,7 +4,7 @@ import { Text } from 'lucide-react'
 import { CollapsibleMessage } from './collapsible-message';
 import { DefaultSkeleton } from './default-skeleton'
 import { BotMessage } from './message';
-import { MessageActions } from './message-actions'
+import { MessageActions } from './message-actions';
 
 export type AnswerSectionProps = {
   content: string

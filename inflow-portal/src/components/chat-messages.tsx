@@ -2,7 +2,7 @@ import { JSONValue, Message } from 'ai'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { RenderMessage } from './render-message'
 import { ToolSection } from './tool-section'
-import { Spinner } from './ui/spinner'
+import { Spinner } from './ui/spinner';
 
 interface ChatMessagesProps {
   messages: Message[]

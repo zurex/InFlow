@@ -6,9 +6,9 @@ import rehypeExternalLinks from 'rehype-external-links'
 import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
-import { Citing } from './custom-link'
-import { CodeBlock } from './ui/codeblock'
-import { MemoizedReactMarkdown } from './ui/markdown'
+import { Citing } from './custom-link';
+import { CodeBlock } from './ui/codeblock';
+import { MemoizedReactMarkdown } from './ui/markdown';
 
 export function BotMessage({
   message,

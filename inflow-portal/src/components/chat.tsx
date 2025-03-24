@@ -2,7 +2,8 @@
 
 import { CHAT_ID } from 'inflow/lib/constants';
 import { Model } from 'inflow/lib/types/models'
-import { Message, useChat } from 'ai/react'
+import { Message } from 'ai/react';
+import { useChat } from '@ai-sdk/react';
 import { useEffect } from 'react'
 import { toast } from 'sonner';
 import { ChatMessages } from './chat-messages';
@@ -47,7 +48,7 @@ export function Chat({
 
     useEffect(() => {
         setMessages(savedMessages)
-    }, [id])
+    }, [id, setMessages, savedMessages])
 
     const onQuerySelect = (query: string) => {
         append({
