@@ -13,7 +13,7 @@ import {
 import { ExtendedCoreMessage } from './types'
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+    return twMerge(clsx(inputs))
 }
 
 /**

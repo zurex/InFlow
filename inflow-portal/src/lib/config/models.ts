@@ -16,80 +16,80 @@ export function validateModel(model: any): model is Model {
 }
 
 export async function getModels(): Promise<Model[]> {
-  try {
-    // Check for BASE_URL environment variable first
-    const baseUrlEnv = process.env.BASE_URL
-    let baseUrlObj: URL
-
-    if (baseUrlEnv) {
-      try {
-        baseUrlObj = new URL(baseUrlEnv)
-        console.log('Using BASE_URL environment variable:', baseUrlEnv)
-      } catch (error) {
-        console.warn(
-          'Invalid BASE_URL environment variable, falling back to headers'
-        )
-        baseUrlObj = await getBaseUrlFromHeaders()
-      }
-    } else {
-      // If BASE_URL is not set, use headers
-      baseUrlObj = await getBaseUrlFromHeaders()
-    }
-
-    // Construct the models.json URL
-    const modelUrl = new URL('/config/models.json', baseUrlObj)
-    console.log('Attempting to fetch models from:', modelUrl.toString())
-
     try {
-      const response = await fetch(modelUrl, {
-        cache: 'no-store',
-        headers: {
-          Accept: 'application/json'
+        // Check for BASE_URL environment variable first
+        const baseUrlEnv = process.env.BASE_URL
+        let baseUrlObj: URL
+
+        if (baseUrlEnv) {
+            try {
+                baseUrlObj = new URL(baseUrlEnv)
+                console.log('Using BASE_URL environment variable:', baseUrlEnv)
+            } catch (error) {
+                console.warn(
+                    'Invalid BASE_URL environment variable, falling back to headers'
+                )
+                baseUrlObj = await getBaseUrlFromHeaders()
+            }
+        } else {
+            // If BASE_URL is not set, use headers
+            baseUrlObj = await getBaseUrlFromHeaders()
         }
-      })
 
-      if (!response.ok) {
-        console.warn(
-          `HTTP error when fetching models: ${response.status} ${response.statusText}`
-        )
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
+        // Construct the models.json URL
+        const modelUrl = new URL('/config/models.json', baseUrlObj)
+        console.log('Attempting to fetch models from:', modelUrl.toString())
 
-      const text = await response.text()
+        try {
+            const response = await fetch(modelUrl, {
+                cache: 'no-store',
+                headers: {
+                    Accept: 'application/json'
+                }
+            })
 
-      // Check if the response starts with HTML doctype
-      if (text.trim().toLowerCase().startsWith('<!doctype')) {
-        console.warn('Received HTML instead of JSON when fetching models')
-        throw new Error('Received HTML instead of JSON')
-      }
+            if (!response.ok) {
+                console.warn(
+                    `HTTP error when fetching models: ${response.status} ${response.statusText}`
+                )
+                throw new Error(`HTTP error! status: ${response.status}`)
+            }
 
-      const config = JSON.parse(text)
-      if (Array.isArray(config.models) && config.models.every(validateModel)) {
-        console.log('Successfully loaded models from URL')
-        return config.models
-      }
-    } catch (error: any) {
-      // Fallback to default models if fetch fails
-      console.warn(
-        'Fetch failed, falling back to default models:',
-        error.message || 'Unknown error'
-      )
+            const text = await response.text()
 
-      if (
-        Array.isArray(defaultModels.models) &&
-        defaultModels.models.every(validateModel)
-      ) {
-        console.log('Successfully loaded default models')
-        return defaultModels.models
-      }
+            // Check if the response starts with HTML doctype
+            if (text.trim().toLowerCase().startsWith('<!doctype')) {
+                console.warn('Received HTML instead of JSON when fetching models')
+                throw new Error('Received HTML instead of JSON')
+            }
+
+            const config = JSON.parse(text)
+            if (Array.isArray(config.models) && config.models.every(validateModel)) {
+                console.log('Successfully loaded models from URL')
+                return config.models
+            }
+        } catch (error: any) {
+            // Fallback to default models if fetch fails
+            console.warn(
+                'Fetch failed, falling back to default models:',
+                error.message || 'Unknown error'
+            )
+
+            if (
+                Array.isArray(defaultModels.models) &&
+                defaultModels.models.every(validateModel)
+            ) {
+                console.log('Successfully loaded default models')
+                return defaultModels.models
+            }
+        }
+    } catch (error) {
+        console.warn('Failed to load models:', error)
     }
-  } catch (error) {
-    console.warn('Failed to load models:', error)
-  }
 
-  // Last resort: return empty array
-  console.warn('All attempts to load models failed, returning empty array')
-  return []
+    // Last resort: return empty array
+    console.warn('All attempts to load models failed, returning empty array')
+    return []
 }
 
 // Helper function to get base URL from headers

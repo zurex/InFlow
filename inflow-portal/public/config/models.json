@@ -49,8 +49,16 @@
       "toolCallType": "native"
     },
     {
-      "id": "<AZURE_DEPLOYMENT_NAME>",
-      "name": "<AZURE_DEPLOYMENT_NAME>",
+      "id": "gpt-35-turbo",
+      "name": "gpt-35-turbo",
+      "provider": "Azure",
+      "providerId": "azure",
+      "enabled": true,
+      "toolCallType": "native"
+    },
+    {
+      "id": "gpt-4o-mini",
+      "name": "gpt-4o-mini",
       "provider": "Azure",
       "providerId": "azure",
       "enabled": true,

@@ -14,29 +14,29 @@ import {
 import { createOllama } from 'ollama-ai-provider'
 
 export const registry = createProviderRegistry({
-  openai,
-  anthropic,
-  google,
-  groq,
-  ollama: createOllama({
-    baseURL: `${process.env.OLLAMA_BASE_URL}/api`
-  }),
-  azure: createAzure({
-    apiKey: process.env.AZURE_API_KEY,
-    resourceName: process.env.AZURE_RESOURCE_NAME
-  }),
-  deepseek,
-  fireworks: {
-    ...createFireworks({
-      apiKey: process.env.FIREWORKS_API_KEY
+    openai,
+    anthropic,
+    google,
+    groq,
+    ollama: createOllama({
+        baseURL: `${process.env.OLLAMA_BASE_URL}/api`
     }),
-    languageModel: fireworks
-  },
-  'openai-compatible': createOpenAI({
-    apiKey: process.env.OPENAI_COMPATIBLE_API_KEY,
-    baseURL: process.env.OPENAI_COMPATIBLE_API_BASE_URL
-  }),
-  xai
+    azure: createAzure({
+        apiKey: process.env.AZURE_API_KEY,
+        resourceName: process.env.AZURE_RESOURCE_NAME
+    }),
+    deepseek,
+    fireworks: {
+        ...createFireworks({
+        apiKey: process.env.FIREWORKS_API_KEY
+        }),
+        languageModel: fireworks
+    },
+    'openai-compatible': createOpenAI({
+        apiKey: process.env.OPENAI_COMPATIBLE_API_KEY,
+        baseURL: process.env.OPENAI_COMPATIBLE_API_BASE_URL
+    }),
+    xai
 })
 
 export function getModel(model: string) {
@@ -87,33 +87,33 @@ export function getModel(model: string) {
 }
 
 export function isProviderEnabled(providerId: string): boolean {
-  switch (providerId) {
-    case 'openai':
-      return !!process.env.OPENAI_API_KEY
-    case 'anthropic':
-      return !!process.env.ANTHROPIC_API_KEY
-    case 'google':
-      return !!process.env.GOOGLE_GENERATIVE_AI_API_KEY
-    case 'groq':
-      return !!process.env.GROQ_API_KEY
-    case 'ollama':
-      return !!process.env.OLLAMA_BASE_URL
-    case 'azure':
-      return !!process.env.AZURE_API_KEY && !!process.env.AZURE_RESOURCE_NAME
-    case 'deepseek':
-      return !!process.env.DEEPSEEK_API_KEY
-    case 'fireworks':
-      return !!process.env.FIREWORKS_API_KEY
-    case 'xai':
-      return !!process.env.XAI_API_KEY
-    case 'openai-compatible':
-      return (
-        !!process.env.OPENAI_COMPATIBLE_API_KEY &&
-        !!process.env.OPENAI_COMPATIBLE_API_BASE_URL
-      )
-    default:
-      return false
-  }
+    switch (providerId) {
+        case 'openai':
+            return !!process.env.OPENAI_API_KEY
+        case 'anthropic':
+            return !!process.env.ANTHROPIC_API_KEY
+        case 'google':
+            return !!process.env.GOOGLE_GENERATIVE_AI_API_KEY
+        case 'groq':
+            return !!process.env.GROQ_API_KEY
+        case 'ollama':
+            return !!process.env.OLLAMA_BASE_URL
+        case 'azure':
+            return !!process.env.AZURE_API_KEY && !!process.env.AZURE_RESOURCE_NAME
+        case 'deepseek':
+            return !!process.env.DEEPSEEK_API_KEY
+        case 'fireworks':
+            return !!process.env.FIREWORKS_API_KEY
+        case 'xai':
+            return !!process.env.XAI_API_KEY
+        case 'openai-compatible':
+            return (
+            !!process.env.OPENAI_COMPATIBLE_API_KEY &&
+            !!process.env.OPENAI_COMPATIBLE_API_BASE_URL
+            )
+        default:
+            return false
+    }
 }
 
 export function getToolCallModel(model?: string) {
