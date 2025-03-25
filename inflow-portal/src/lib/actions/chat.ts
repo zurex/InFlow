@@ -4,9 +4,10 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { type Chat } from 'inflow/lib/types'
 import { getRedisClient, RedisWrapper } from 'inflow/lib/redis/config'
+import { RedisAdapter } from 'inflow/platform/storage/common/redis';
 
-async function getRedis(): Promise<RedisWrapper> {
-  return await getRedisClient()
+async function getRedis(): Promise<RedisAdapter> {
+  return RedisAdapter.defaultClient
 }
 
 const CHAT_VERSION = 'v2'
@@ -21,9 +22,9 @@ export async function getChats(userId?: string | null) {
 
   try {
     const redis = await getRedis()
-    const chats = await redis.zrange(getUserChatKey(userId), 0, -1, {
-      rev: true
-    })
+    const chats = await redis.zrange(getUserChatKey(userId), 0, -1);
+
+    console.log('chats:', chats)
 
     if (chats.length === 0) {
       return []
@@ -58,13 +59,14 @@ export async function getChats(userId?: string | null) {
         return plainChat as Chat
       })
   } catch (error) {
+    console.log('Error getting chats:', error)
     return []
   }
 }
 
 export async function getChat(id: string, userId: string = 'anonymous') {
   const redis = await getRedis()
-  const chat = await redis.hgetall<Chat>(`chat:${id}`)
+  const chat: Chat = await redis.hgetall(`chat:${id}`) as Chat
 
   if (!chat) {
     return null
@@ -123,7 +125,7 @@ export async function saveChat(chat: Chat, userId: string = 'anonymous') {
     pipeline.zadd(getUserChatKey(userId), Date.now(), `chat:${chat.id}`)
 
     const results = await pipeline.exec()
-
+    console.log('result:', results)
     return results
   } catch (error) {
     throw error
@@ -132,7 +134,7 @@ export async function saveChat(chat: Chat, userId: string = 'anonymous') {
 
 export async function getSharedChat(id: string) {
   const redis = await getRedis()
-  const chat = await redis.hgetall<Chat>(`chat:${id}`)
+  const chat = await redis.hgetall(`chat:${id}`) as Chat
 
   if (!chat || !chat.sharePath) {
     return null
@@ -143,7 +145,7 @@ export async function getSharedChat(id: string) {
 
 export async function shareChat(id: string, userId: string = 'anonymous') {
   const redis = await getRedis()
-  const chat = await redis.hgetall<Chat>(`chat:${id}`)
+  const chat = await redis.hgetall(`chat:${id}`) as Chat
 
   if (!chat || chat.userId !== userId) {
     return null
