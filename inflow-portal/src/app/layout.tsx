@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from '@vercel/analytics/react';
 import './globals.css';
 import { SidebarInset, SidebarProvider } from 'inflow/components/ui/sidebar';
 import { SiteHeader } from 'inflow/components/site-header';
@@ -43,6 +44,7 @@ export default function RootLayout({
                     </SidebarProvider>
                 </div>
                 <SpeedInsights />
+                <Analytics />
             </body>
         </html>
     );

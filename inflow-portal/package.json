@@ -35,6 +35,7 @@
     "@tailwindcss/cli": "^4.0.15",
     "@tailwindcss/typography": "^0.5.16",
     "@upstash/redis": "^1.34.6",
+    "@vercel/analytics": "^1.5.0",
     "@vercel/speed-insights": "^1.2.0",
     "addressparser": "^1.0.1",
     "ai": "^4.2.1",
