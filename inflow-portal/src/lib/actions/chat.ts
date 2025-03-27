@@ -32,6 +32,9 @@ export async function getChats(userId?: string | null) {
 
     const results = await Promise.all(
       chats.map(async chatKey => {
+        if (chatKey.indexOf("undefined") !== -1) {
+          return null
+        }
         const chat = await redis.hgetall(chatKey)
         return chat
       })
