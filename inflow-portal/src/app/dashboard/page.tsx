@@ -1,4 +1,4 @@
-import { AppSidebar } from "inflow/components/app-sidebar"
+import { AppSidebar } from "inflow/components/sidebar/app-sidebar"
 import { SiteHeader } from "inflow/components/site-header"
 import {
   SidebarInset,

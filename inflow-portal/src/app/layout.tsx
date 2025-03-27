@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 import { SidebarInset, SidebarProvider } from 'inflow/components/ui/sidebar';
 import { SiteHeader } from 'inflow/components/site-header';
-import { AppSidebar } from 'inflow/components/app-sidebar';
+import { AppSidebar } from 'inflow/components/sidebar/app-sidebar';
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -41,6 +42,7 @@ export default function RootLayout({
                         </div>
                     </SidebarProvider>
                 </div>
+                <SpeedInsights />
             </body>
         </html>
     );

@@ -27,6 +27,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "inflow/components/ui/sidebar"
+import Link from "next/link"
 
 const data = {
   user: {
@@ -162,15 +163,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="#">
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <Command className="size-4" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Acme Inc</span>
-                  <span className="truncate text-xs">Enterprise</span>
-                </div>
-              </a>
+              <Link href="/">
+                <Command className="h-5 w-5" />
+                <span className="text-base font-semibold">InFlow</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

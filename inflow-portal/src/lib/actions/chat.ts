@@ -59,6 +59,7 @@ export async function getChats(userId?: string | null) {
         if (plainChat.createdAt && !(plainChat.createdAt instanceof Date)) {
           plainChat.createdAt = new Date(plainChat.createdAt)
         }
+        console.log('plainChat:', plainChat)
         return plainChat as Chat
       })
   } catch (error) {
