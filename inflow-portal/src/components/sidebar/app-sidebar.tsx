@@ -28,6 +28,8 @@ import {
   SidebarMenuItem,
 } from "inflow/components/ui/sidebar"
 import Link from "next/link"
+import { verifyCredential } from "inflow/lib/dal"
+import { NavLogin } from "./nav-login"
 
 const data = {
   user: {
@@ -153,32 +155,33 @@ const data = {
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  return (
-    <Sidebar
-      className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
-      {...props}
-    >
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <Link href="/">
-                <Command className="h-5 w-5" />
-                <span className="text-base font-semibold">InFlow</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
-      <SidebarContent>
-        <NavMain />
-        <NavProjects />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
-      </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={data.user} />
-      </SidebarFooter>
-    </Sidebar>
-  )
+export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+    const { isAuth } = await verifyCredential();
+    return (
+        <Sidebar
+            className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
+            {...props}
+        >
+            <SidebarHeader>
+                <SidebarMenu>
+                <SidebarMenuItem>
+                    <SidebarMenuButton size="lg" asChild>
+                    <Link href="/">
+                        <Command className="h-5 w-5" />
+                        <span className="text-base font-semibold">InFlow</span>
+                    </Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+                </SidebarMenu>
+            </SidebarHeader>
+            <SidebarContent>
+                <NavMain />
+                <NavProjects />
+                <NavSecondary className="mt-auto" />
+            </SidebarContent>
+            <SidebarFooter>
+                {isAuth ? <NavUser user={data.user} /> : <NavLogin />}
+            </SidebarFooter>
+        </Sidebar>
+    )
 }
