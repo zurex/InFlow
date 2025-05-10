@@ -77,6 +77,11 @@
     "tw-animate-css": "^1.2.4",
     "vaul": "^1.1.2"
   },
+  "overrides": {
+    "sonner": {
+      "react": "^19.0.0"
+    }
+  },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
