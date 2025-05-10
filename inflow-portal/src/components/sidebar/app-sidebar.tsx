@@ -28,7 +28,7 @@ import {
   SidebarMenuItem,
 } from "inflow/components/ui/sidebar"
 import Link from "next/link"
-import { verifyCredential } from "inflow/lib/dal"
+import { getUser, verifyCredential } from "inflow/lib/dal"
 import { NavLogin } from "./nav-login"
 
 const data = {
@@ -156,7 +156,7 @@ const data = {
 }
 
 export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-    const { isAuth } = await verifyCredential();
+    const user = await getUser();
     return (
         <Sidebar
             className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
@@ -180,7 +180,7 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
                 <NavSecondary className="mt-auto" />
             </SidebarContent>
             <SidebarFooter>
-                {isAuth ? <NavUser user={data.user} /> : <NavLogin />}
+                {user ? <NavUser user={user} /> : <NavLogin />}
             </SidebarFooter>
         </Sidebar>
     )

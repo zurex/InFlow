@@ -10,7 +10,7 @@ const HistoryContainer: React.FC = async () => {
 
     return (
         <History>
-            <HistoryList userId="anonymous" />
+            <HistoryList />
         </History>
     )
 }

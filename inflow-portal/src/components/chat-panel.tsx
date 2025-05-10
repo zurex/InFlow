@@ -1,15 +1,16 @@
 'use client'
 
-import { Model } from 'inflow/lib/types/models';
-import { cn } from 'inflow/lib/utils';
-import { Message } from 'ai';
-import { ArrowUp, MessageCirclePlus, Square } from 'lucide-react'
+import { Model } from 'inflow/lib/types/models'
+import { cn } from 'inflow/lib/utils'
+import { Message } from 'ai'
+import { ArrowUp, ChevronDown, MessageCirclePlus, Square } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import Textarea from 'react-textarea-autosize';
+import Textarea from 'react-textarea-autosize'
+import { useArtifact } from './artifact/artifact-context'
 import { EmptyScreen } from './empty-screen'
-import { ModelSelector } from './model-selector';
-import { SearchModeToggle } from './search-mode-toggle';
+import { ModelSelector } from './model-selector'
+import { SearchModeToggle } from './search-mode-toggle'
 import { Button } from './ui/button'
 import { IconLogo } from './ui/icons'
 
@@ -24,6 +25,8 @@ interface ChatPanelProps {
   stop: () => void
   append: (message: any) => void
   models?: Model[]
+  /** Whether auto-scroll is currently active (at bottom) */
+  isAutoScroll: boolean
 }
 
 export function ChatPanel({
@@ -36,7 +39,8 @@ export function ChatPanel({
   query,
   stop,
   append,
-  models
+  models,
+  isAutoScroll
 }: ChatPanelProps) {
   const [showEmptyScreen, setShowEmptyScreen] = useState(false)
   const router = useRouter()
@@ -44,6 +48,7 @@ export function ChatPanel({
   const isFirstRender = useRef(true)
   const [isComposing, setIsComposing] = useState(false) // Composition state
   const [enterDisabled, setEnterDisabled] = useState(false) // Disable Enter after composition ends
+  const { close: closeArtifact } = useArtifact()
 
   const handleCompositionStart = () => setIsComposing(true)
 
@@ -57,7 +62,23 @@ export function ChatPanel({
 
   const handleNewChat = () => {
     setMessages([])
+    closeArtifact()
     router.push('/')
+  }
+
+  const isToolInvocationInProgress = () => {
+    if (!messages.length) return false
+
+    const lastMessage = messages[messages.length - 1]
+    if (lastMessage.role !== 'assistant' || !lastMessage.parts) return false
+
+    const parts = lastMessage.parts
+    const lastPart = parts[parts.length - 1]
+
+    return (
+      lastPart?.type === 'tool-invocation' &&
+      lastPart?.toolInvocation?.state === 'call'
+    )
   }
 
   // if query is not empty, submit the query
@@ -72,27 +93,50 @@ export function ChatPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query])
 
+  // Add scroll to bottom handler
+  const handleScrollToBottom = () => {
+    const scrollContainer = document.getElementById('scroll-container')
+    if (scrollContainer) {
+      scrollContainer.scrollTo({
+        top: scrollContainer.scrollHeight,
+        behavior: 'smooth'
+      })
+    }
+  }
+
   return (
     <div
       className={cn(
-        'mx-auto w-full',
-        messages.length > 0
-          ? 'fixed bottom-0 left-0 right-0 bg-background'
-          : 'fixed bottom-8 left-0 right-0 top-6 flex flex-col items-center justify-center'
+        'w-full bg-background group/form-container shrink-0',
+        messages.length > 0 ? 'sticky bottom-0 px-2 pb-4' : 'px-6'
       )}
     >
       {messages.length === 0 && (
-        <div className="mb-8">
+        <div className="mb-10 flex flex-col items-center gap-4">
           <IconLogo className="size-12 text-muted-foreground" />
+          <p className="text-center text-3xl font-semibold">
+            How can I help you today?
+          </p>
         </div>
       )}
       <form
         onSubmit={handleSubmit}
-        className={cn(
-          'max-w-3xl w-full mx-auto',
-          messages.length > 0 ? 'px-2 py-4' : 'px-6'
-        )}
+        className={cn('max-w-3xl w-full mx-auto relative')}
       >
+        {/* Add scroll-down button to ChatPanel right top - show when not auto scrolling */}
+        {!isAutoScroll && messages.length > 0 && (
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="absolute -top-10 right-4 z-20 size-8 rounded-full shadow-md"
+            onClick={handleScrollToBottom}
+            title="Scroll to bottom"
+          >
+            <ChevronDown size={16} />
+          </Button>
+        )}
+
         <div className="relative flex flex-col w-full gap-2 bg-muted rounded-3xl border border-input">
           <Textarea
             ref={inputRef}
@@ -105,7 +149,8 @@ export function ChatPanel({
             placeholder="Ask a question..."
             spellCheck={false}
             value={input}
-            className="resize-none w-full min-h-12 bg-transparent border-0 px-4 py-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={isLoading || isToolInvocationInProgress()}
+            className="resize-none w-full min-h-12 bg-transparent border-0 p-4 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             onChange={e => {
               handleInputChange(e)
               setShowEmptyScreen(e.target.value.length === 0)
@@ -144,7 +189,7 @@ export function ChatPanel({
                   onClick={handleNewChat}
                   className="shrink-0 rounded-full group"
                   type="button"
-                  disabled={isLoading}
+                  disabled={isLoading || isToolInvocationInProgress()}
                 >
                   <MessageCirclePlus className="size-4 group-hover:rotate-12 transition-all" />
                 </Button>
@@ -154,7 +199,10 @@ export function ChatPanel({
                 size={'icon'}
                 variant={'outline'}
                 className={cn(isLoading && 'animate-pulse', 'rounded-full')}
-                disabled={input.length === 0 && !isLoading}
+                disabled={
+                  (input.length === 0 && !isLoading) ||
+                  isToolInvocationInProgress()
+                }
                 onClick={isLoading ? stop : undefined}
               >
                 {isLoading ? <Square size={20} /> : <ArrowUp size={20} />}

@@ -1,8 +1,9 @@
-import { JSONValue, Message } from 'ai'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { cn } from 'inflow/lib/utils'
+import { ChatRequestOptions, JSONValue, Message } from 'ai'
+import { useEffect, useMemo, useState } from 'react'
 import { RenderMessage } from './render-message'
 import { ToolSection } from './tool-section'
-import { Spinner } from './ui/spinner';
+import { Spinner } from './ui/spinner'
 
 interface ChatMessagesProps {
   messages: Message[]
@@ -10,6 +11,16 @@ interface ChatMessagesProps {
   onQuerySelect: (query: string) => void
   isLoading: boolean
   chatId?: string
+  addToolResult?: (params: { toolCallId: string; result: any }) => void
+  /** Ref for anchoring auto-scroll position */
+  anchorRef: React.RefObject<HTMLDivElement|null>
+  /** Ref for the scroll container */
+  scrollContainerRef: React.RefObject<HTMLDivElement|null>
+  onUpdateMessage?: (messageId: string, newContent: string) => Promise<void>
+  reload?: (
+    messageId: string,
+    options?: ChatRequestOptions
+  ) => Promise<string | null | undefined>
 }
 
 export function ChatMessages({
@@ -17,23 +28,15 @@ export function ChatMessages({
   data,
   onQuerySelect,
   isLoading,
-  chatId
+  chatId,
+  addToolResult,
+  anchorRef,
+  scrollContainerRef,
+  onUpdateMessage,
+  reload
 }: ChatMessagesProps) {
   const [openStates, setOpenStates] = useState<Record<string, boolean>>({})
   const manualToolCallId = 'manual-tool-call'
-
-  // Add ref for the messages container
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-
-  // Scroll to bottom function
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'instant' })
-  }
-
-  // Scroll to bottom on mount and when messages change
-  useEffect(() => {
-    scrollToBottom()
-  }, [])
 
   useEffect(() => {
     const lastMessage = messages[messages.length - 1]
@@ -93,31 +96,47 @@ export function ChatMessages({
   }
 
   return (
-    <div className="relative mx-auto px-4 w-full">
-      {messages.map(message => (
-        <div key={message.id} className="mb-4 flex flex-col gap-4">
-          <RenderMessage
-            message={message}
-            messageId={message.id}
-            getIsOpen={getIsOpen}
-            onOpenChange={handleOpenChange}
-            onQuerySelect={onQuerySelect}
-            chatId={chatId}
-          />
-        </div>
-      ))}
-      {showLoading &&
-        (lastToolData ? (
-          <ToolSection
-            key={manualToolCallId}
-            tool={lastToolData}
-            isOpen={getIsOpen(manualToolCallId)}
-            onOpenChange={open => handleOpenChange(manualToolCallId, open)}
-          />
-        ) : (
-          <Spinner />
+    <div
+      id="scroll-container"
+      ref={scrollContainerRef}
+      role="list"
+      aria-roledescription="chat messages"
+      className={cn(
+        'relative size-full pt-14',
+        messages.length > 0 ? 'flex-1 overflow-y-auto' : ''
+      )}
+      style={{ contain: 'strict' }}
+    >
+      <div className="relative mx-auto w-full max-w-3xl px-4">
+        {messages.map(message => (
+          <div key={message.id} className="mb-4 flex flex-col gap-4">
+            <RenderMessage
+              message={message}
+              messageId={message.id}
+              getIsOpen={getIsOpen}
+              onOpenChange={handleOpenChange}
+              onQuerySelect={onQuerySelect}
+              chatId={chatId}
+              addToolResult={addToolResult}
+              onUpdateMessage={onUpdateMessage}
+              reload={reload}
+            />
+          </div>
         ))}
-      <div ref={messagesEndRef} /> {/* Add empty div as scroll anchor */}
+        {showLoading &&
+          (lastToolData ? (
+            <ToolSection
+              key={manualToolCallId}
+              tool={lastToolData}
+              isOpen={getIsOpen(manualToolCallId)}
+              onOpenChange={open => handleOpenChange(manualToolCallId, open)}
+              addToolResult={addToolResult}
+            />
+          ) : (
+            <Spinner />
+          ))}
+        <div ref={anchorRef} />
+      </div>
     </div>
   )
 }

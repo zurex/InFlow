@@ -19,9 +19,10 @@ import { Spinner } from './ui/spinner'
 
 type ClearHistoryProps = {
   empty: boolean
+  userId: string;
 }
 
-export function ClearHistory({ empty }: ClearHistoryProps) {
+export function ClearHistory({ empty, userId }: ClearHistoryProps) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
   return (
@@ -46,7 +47,7 @@ export function ClearHistory({ empty }: ClearHistoryProps) {
             onClick={event => {
               event.preventDefault()
               startTransition(async () => {
-                const result = await clearChats()
+                const result = await clearChats(userId)
                 if (result?.error) {
                   toast.error(result.error)
                 } else {

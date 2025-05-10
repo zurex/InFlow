@@ -49,25 +49,25 @@ const formatDateWithTime = (date: Date | string) => {
 }
 
 const HistoryItem: React.FC<HistoryItemProps> = ({ chat }) => {
-  const pathname = usePathname()
-  const isActive = pathname === chat.path
+    const pathname = usePathname()
+    const isActive = pathname === chat.path
 
-  return (
-    <Link
-      href={chat.path}
-      className={cn(
-        'flex flex-col hover:bg-muted cursor-pointer p-2 rounded border',
-        isActive ? 'bg-muted/70 border-border' : 'border-transparent'
-      )}
-    >
-      <div className="text-xs font-medium truncate select-none">
-        {chat.title}
-      </div>
-      <div className="text-xs text-muted-foreground">
-        {formatDateWithTime(chat.createdAt)}
-      </div>
-    </Link>
-  )
+    return (
+      <Link
+        href={chat.path||''}
+        className={cn(
+          'flex flex-col hover:bg-muted cursor-pointer p-2 rounded border',
+          isActive ? 'bg-muted/70 border-border' : 'border-transparent'
+        )}
+      >
+        <div className="text-xs font-medium truncate select-none">
+          {chat.title}
+        </div>
+        <div className="text-xs text-muted-foreground">
+          {formatDateWithTime(chat.createdAt)}
+        </div>
+      </Link>
+    )
 }
 
 export default HistoryItem

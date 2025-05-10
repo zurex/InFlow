@@ -7,160 +7,166 @@ import { getRedisClient, RedisWrapper } from 'inflow/lib/redis/config'
 import { RedisAdapter } from 'inflow/platform/storage/common/redis';
 
 async function getRedis(): Promise<RedisAdapter> {
-  return RedisAdapter.defaultClient
+    return RedisAdapter.defaultClient
 }
 
 const CHAT_VERSION = 'v2'
 function getUserChatKey(userId: string) {
-  return `user:${CHAT_VERSION}:chat:${userId}`
+    return `user:${CHAT_VERSION}:chat:${userId}`
 }
 
 export async function getChats(userId?: string | null) {
-  if (!userId) {
-    return []
-  }
-
-  try {
-    const redis = await getRedis()
-    const chats = await redis.zrange(getUserChatKey(userId), 0, -1);
-
-    console.log('chats:', chats)
-
-    if (chats.length === 0) {
-      return []
+    if (!userId) {
+        return []
     }
 
-    const results = await Promise.all(
-      chats.map(async chatKey => {
-        if (chatKey.indexOf("undefined") !== -1) {
-          return null
-        }
-        const chat = await redis.hgetall(chatKey)
-        return chat
-      })
-    )
+    try {
+        const redis = await getRedis()
+        const chats = await redis.zrange(getUserChatKey(userId), 0, -1);
 
-    return results
-      .filter((result): result is Record<string, any> => {
-        if (result === null || Object.keys(result).length === 0) {
-          return false
+        console.log('chats:', userId, chats)
+
+        if (chats.length === 0) {
+        return []
         }
-        return true
-      })
-      .map(chat => {
-        const plainChat = { ...chat }
-        if (typeof plainChat.messages === 'string') {
-          try {
-            plainChat.messages = JSON.parse(plainChat.messages)
-          } catch (error) {
-            plainChat.messages = []
-          }
-        }
-        if (plainChat.createdAt && !(plainChat.createdAt instanceof Date)) {
-          plainChat.createdAt = new Date(plainChat.createdAt)
-        }
-        console.log('plainChat:', plainChat)
-        return plainChat as Chat
-      })
-  } catch (error) {
-    console.log('Error getting chats:', error)
-    return []
-  }
+
+        const results = await Promise.all(
+        chats.map(async chatKey => {
+            if (chatKey.indexOf("undefined") !== -1) {
+            return null
+            }
+            const chat = await redis.hgetall(chatKey)
+            return chat
+        })
+        )
+
+        return results
+        .filter((result): result is Record<string, any> => {
+            if (result === null || Object.keys(result).length === 0) {
+            return false
+            }
+            return true
+        })
+        .map(chat => {
+            const plainChat = { ...chat }
+            if (typeof plainChat.messages === 'string') {
+            try {
+                plainChat.messages = JSON.parse(plainChat.messages)
+            } catch (error) {
+                plainChat.messages = []
+            }
+            }
+            if (plainChat.createdAt && !(plainChat.createdAt instanceof Date)) {
+            plainChat.createdAt = new Date(plainChat.createdAt)
+            }
+            console.log('plainChat:', plainChat)
+            return plainChat as Chat
+        })
+    } catch (error) {
+        console.log('Error getting chats:', error)
+        return []
+    }
 }
 
-export async function getChat(id: string, userId: string = 'anonymous') {
-  const redis = await getRedis()
-  const chat: Chat = await redis.hgetall(`chat:${id}`) as Chat
+export async function getChat(id: string, userId: string) {
+    console.log('getChat:', id, userId)
+    const redis = await getRedis()
+    const chat: Chat = await redis.hgetall(`chat:${id}`) as Chat
 
-  if (!chat) {
-    return null
-  }
-
-  // Parse the messages if they're stored as a string
-  if (typeof chat.messages === 'string') {
-    try {
-      chat.messages = JSON.parse(chat.messages)
-    } catch (error) {
-      chat.messages = []
+    if (!chat || chat.messages === undefined || chat.messages === null || chat.messages.length === 0) {
+        return null
     }
-  }
 
-  // Ensure messages is always an array
-  if (!Array.isArray(chat.messages)) {
-    chat.messages = []
-  }
+    // Parse the messages if they're stored as a string
+    if (typeof chat.messages === 'string') {
+        try {
+        chat.messages = JSON.parse(chat.messages)
+        } catch (error) {
+        chat.messages = []
+        }
+    }
 
-  return chat
+    // Ensure messages is always an array
+    if (!Array.isArray(chat.messages)) {
+        chat.messages = []
+        
+    }
+
+    console.log('get chat result:', chat)
+
+    return chat
 }
 
 export async function clearChats(
-  userId: string = 'anonymous'
+    userId: string
 ): Promise<{ error?: string }> {
-  const redis = await getRedis()
-  const userChatKey = getUserChatKey(userId)
-  const chats = await redis.zrange(userChatKey, 0, -1)
-  if (!chats.length) {
-    return { error: 'No chats to clear' }
-  }
-  const pipeline = redis.pipeline()
-
-  for (const chat of chats) {
-    pipeline.del(chat)
-    pipeline.zrem(userChatKey, chat)
-  }
-
-  await pipeline.exec()
-
-  revalidatePath('/')
-  redirect('/')
-}
-
-export async function saveChat(chat: Chat, userId: string = 'anonymous') {
-  try {
+    console.log('Clearing chats for user:', userId)
     const redis = await getRedis()
+    const userChatKey = getUserChatKey(userId)
+    const chats = await redis.zrange(userChatKey, 0, -1)
+    if (!chats.length) {
+        return { error: 'No chats to clear' }
+    }
     const pipeline = redis.pipeline()
 
-    const chatToSave = {
-      ...chat,
-      messages: JSON.stringify(chat.messages)
+    for (const chat of chats) {
+        pipeline.del(chat)
+        pipeline.zrem(userChatKey, chat)
     }
 
-    pipeline.hmset(`chat:${chat.id}`, chatToSave)
-    pipeline.zadd(getUserChatKey(userId), Date.now(), `chat:${chat.id}`)
+    await pipeline.exec()
 
-    const results = await pipeline.exec()
-    console.log('result:', results)
-    return results
-  } catch (error) {
-    throw error
-  }
+    revalidatePath('/')
+    redirect('/')
+}
+
+export async function saveChat(chat: Chat, userId: string) {
+    try {
+        console.log('Saving chat:', userId, chat.id)
+        const redis = await getRedis()
+        const pipeline = redis.pipeline()
+
+        const chatToSave = {
+            ...chat,
+            messages: JSON.stringify(chat.messages)
+        }
+
+        pipeline.hmset(`chat:${chat.id}`, chatToSave)
+        pipeline.zadd(getUserChatKey(userId), Date.now(), `chat:${chat.id}`)
+
+        const results = await pipeline.exec()
+        console.log('result:', results)
+        return results
+    } catch (error) {
+        throw error
+    }
 }
 
 export async function getSharedChat(id: string) {
-  const redis = await getRedis()
-  const chat = await redis.hgetall(`chat:${id}`) as Chat
+    const redis = await getRedis()
+    const chat = await redis.hgetall(`chat:${id}`) as Chat
 
-  if (!chat || !chat.sharePath) {
-    return null
-  }
+    if (!chat || !chat.sharePath) {
+        return null
+    }
 
-  return chat
+    return chat
 }
 
-export async function shareChat(id: string, userId: string = 'anonymous') {
-  const redis = await getRedis()
-  const chat = await redis.hgetall(`chat:${id}`) as Chat
+export async function shareChat(id: string, userId: string) {
+    const redis = await getRedis()
+    const chat = await redis.hgetall(`chat:${id}`) as Chat
 
-  if (!chat || chat.userId !== userId) {
-    return null
-  }
+    if (!chat || chat.userId !== userId) {
+        return null
+    }
 
-  const payload = {
-    ...chat,
-    sharePath: `/share/${id}`
-  }
+    const payload = {
+        ...chat,
+        sharePath: `/share/${id}`
+    }
 
-  await redis.hmset(`chat:${id}`, payload)
+    await redis.hmset(`chat:${id}`, payload)
 
-  return payload
+    return payload
 }

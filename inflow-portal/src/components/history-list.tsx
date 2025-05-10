@@ -3,6 +3,7 @@ import HistoryItem from './history-item';
 import { Chat } from 'inflow/lib/types';
 import { getChats } from 'inflow/lib/actions/chat';
 import { ClearHistory } from './clear-history';
+import { verifyCredential } from 'inflow/lib/dal';
 
 type HistoryListProps = {
   userId?: string
@@ -13,7 +14,8 @@ const loadChats = cache(async (userId?: string) => {
 })
 
 // Start of Selection
-export async function HistoryList({ userId }: HistoryListProps) {
+export async function HistoryList({ }: HistoryListProps) {
+  const {userId} = await verifyCredential();
   const chats = await getChats(userId)
 
   return (
@@ -30,7 +32,7 @@ export async function HistoryList({ userId }: HistoryListProps) {
         )}
       </div>
       <div className="mt-auto">
-        <ClearHistory empty={!chats?.length} />
+        <ClearHistory userId={userId!} empty={!chats?.length} />
       </div>
     </div>
   )

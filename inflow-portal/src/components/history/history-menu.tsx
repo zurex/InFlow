@@ -23,7 +23,7 @@ export function HistoryMenu() {
                     <CollapsibleContent>
                         <SidebarMenuSub>
                             <SidebarMenuSubItem />
-                            <HistoryList userId="anonymous" />
+                            <HistoryList />
                         </SidebarMenuSub>
                     </CollapsibleContent>
                 </SidebarMenuItem>

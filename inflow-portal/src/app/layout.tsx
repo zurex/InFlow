@@ -6,6 +6,7 @@ import './globals.css';
 import { SidebarInset, SidebarProvider } from 'inflow/components/ui/sidebar';
 import { SiteHeader } from 'inflow/components/site-header';
 import { AppSidebar } from 'inflow/components/sidebar/app-sidebar';
+import ArtifactRoot from 'inflow/components/artifact/artifact-root';
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -38,7 +39,9 @@ export default function RootLayout({
                         <div className="flex flex-1">
                             <AppSidebar />
                             <SidebarInset>
-                                {children}
+                                <ArtifactRoot>
+                                    {children}
+                                </ArtifactRoot>
                             </SidebarInset>
                         </div>
                     </SidebarProvider>

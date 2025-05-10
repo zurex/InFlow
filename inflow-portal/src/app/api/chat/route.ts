@@ -1,3 +1,4 @@
+import { verifyCredential } from 'inflow/lib/dal';
 import { createManualToolStreamResponse } from 'inflow/lib/streaming/create-manual-tool-stream'
 import { createToolCallingStreamResponse } from 'inflow/lib/streaming/create-tool-calling-stream'
 import { Model } from 'inflow/lib/types/models'
@@ -22,6 +23,14 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
     try {
+        const { isAuth, userId } = await verifyCredential();
+        if (!isAuth) {
+            return new Response('Unauthorized', {
+                status: 401,
+                statusText: 'Unauthorized'
+            })
+        };
+
         const { messages, id: chatId } = await req.json()
         const referer = req.headers.get('referer')
         const isSharePage = referer?.includes('/share/')
@@ -63,18 +72,20 @@ export async function POST(req: Request) {
         const supportsToolCalling = selectedModel.toolCallType === 'native'
 
         return supportsToolCalling
-        ? createToolCallingStreamResponse({
-                messages,
-                model: selectedModel,
-                chatId,
-                searchMode
-            })
-        : createManualToolStreamResponse({
-                messages,
-                model: selectedModel,
-                chatId,
-                searchMode
-            })
+            ? createToolCallingStreamResponse({
+                    userId,
+                    messages,
+                    model: selectedModel,
+                    chatId,
+                    searchMode
+                })
+            : createManualToolStreamResponse({
+                    userId,
+                    messages,
+                    model: selectedModel,
+                    chatId,
+                    searchMode
+                });
     } catch (error) {
         console.error('API route error:', error)
         return new Response('Error processing your request', {

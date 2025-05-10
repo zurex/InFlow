@@ -27,10 +27,12 @@ export const getCredentialToken = async () => {
     return token;
 }
 
+type VerifyedCredential = {isAuth: true; userId: string} | {isAuth: false; userId: null};
+
 /**
  * Verify the token from the Authorization header.
  */
-export const verifyCredential = cache(async (): Promise<{ isAuth: boolean; userId: string | null; }> => {
+export const verifyCredential = cache(async (): Promise<VerifyedCredential> => {
 
     const token = await getCredentialToken();
 
