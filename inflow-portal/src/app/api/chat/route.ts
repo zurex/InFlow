@@ -10,8 +10,8 @@ export const maxDuration = 30
 const DEFAULT_MODEL: Model = {
   id: 'gpt-4o-mini',
   name: 'GPT-4o mini',
-  provider: 'OpenAI',
-  providerId: 'openai',
+  provider: 'OpenAI Compatible',
+  providerId: 'openai-compatible',
   enabled: true,
   toolCallType: 'native'
 }

@@ -49,6 +49,16 @@ export const verifyCredential = cache(async (): Promise<VerifyedCredential> => {
     }
 });
 
+export const getCurrentUserId = async () => {
+    const { isAuth, userId } = await verifyCredential();
+
+    if (isAuth === false || !userId) {
+        return 'anonymous';
+    }
+
+    return userId;
+}
+
 /**
  * Fetch the user from the database.
  */
