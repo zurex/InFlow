@@ -45,6 +45,7 @@ export function researcher({
   searchMode: boolean
 }): ResearcherReturn {
     try {
+        console.log('[researcher] searchMode:', searchMode)
         const currentDate = new Date().toLocaleString();
 
         const searchTool = createSearchTool(model);

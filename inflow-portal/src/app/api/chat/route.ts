@@ -24,12 +24,6 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
     try {
         const { isAuth, userId } = await verifyCredential();
-        if (!isAuth) {
-            return new Response('Unauthorized', {
-                status: 401,
-                statusText: 'Unauthorized'
-            })
-        };
 
         const { messages, id: chatId } = await req.json()
         const referer = req.headers.get('referer')

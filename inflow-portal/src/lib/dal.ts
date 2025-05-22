@@ -5,6 +5,7 @@ import { prisma } from 'inflow/base/storage/common/prisma';
 import { verifyJWT } from 'inflow/server/common/jwt';
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { ANONYMOUS_USER_ID } from 'inflow/lib/constants';
 import { cache } from 'react';
 
 /**
@@ -27,7 +28,7 @@ export const getCredentialToken = async () => {
     return token;
 }
 
-type VerifyedCredential = {isAuth: true; userId: string} | {isAuth: false; userId: null};
+type VerifyedCredential = {isAuth: true; userId: string} | {isAuth: false; userId: typeof ANONYMOUS_USER_ID};
 
 /**
  * Verify the token from the Authorization header.
@@ -37,7 +38,7 @@ export const verifyCredential = cache(async (): Promise<VerifyedCredential> => {
     const token = await getCredentialToken();
 
     if (!token) {
-        return { isAuth: false, userId: null };
+        return { isAuth: false, userId: ANONYMOUS_USER_ID };
     }
 
     try {
@@ -45,7 +46,7 @@ export const verifyCredential = cache(async (): Promise<VerifyedCredential> => {
         return { isAuth: true, userId: id };
     } catch (error)
     { 
-        return { isAuth: false, userId: null };
+        return { isAuth: false, userId: ANONYMOUS_USER_ID };
     }
 });
 
@@ -53,7 +54,7 @@ export const getCurrentUserId = async () => {
     const { isAuth, userId } = await verifyCredential();
 
     if (isAuth === false || !userId) {
-        return 'anonymous';
+        return ANONYMOUS_USER_ID;
     }
 
     return userId;

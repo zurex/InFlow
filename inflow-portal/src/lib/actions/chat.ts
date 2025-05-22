@@ -3,8 +3,8 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { type Chat } from 'inflow/lib/types'
-import { getRedisClient, RedisWrapper } from 'inflow/lib/redis/config'
 import { RedisAdapter } from 'inflow/platform/storage/common/redis';
+import { ANONYMOUS_USER_ID } from '../constants';
 
 async function getRedis(): Promise<RedisAdapter> {
     return RedisAdapter.defaultClient
@@ -16,7 +16,7 @@ function getUserChatKey(userId: string) {
 }
 
 export async function getChats(userId?: string | null) {
-    if (!userId) {
+    if (!userId || userId === ANONYMOUS_USER_ID) {
         return []
     }
 
@@ -33,7 +33,7 @@ export async function getChats(userId?: string | null) {
         const results = await Promise.all(
         chats.map(async chatKey => {
             if (chatKey.indexOf("undefined") !== -1) {
-            return null
+                return null
             }
             const chat = await redis.hgetall(chatKey)
             return chat
@@ -43,23 +43,23 @@ export async function getChats(userId?: string | null) {
         return results
         .filter((result): result is Record<string, any> => {
             if (result === null || Object.keys(result).length === 0) {
-            return false
+                return false
             }
             return true
         })
         .map(chat => {
             const plainChat = { ...chat }
             if (typeof plainChat.messages === 'string') {
-            try {
-                plainChat.messages = JSON.parse(plainChat.messages)
-            } catch (error) {
-                plainChat.messages = []
-            }
+                try {
+                    plainChat.messages = JSON.parse(plainChat.messages)
+                } catch (error) {
+                    plainChat.messages = []
+                }
             }
             if (plainChat.createdAt && !(plainChat.createdAt instanceof Date)) {
-            plainChat.createdAt = new Date(plainChat.createdAt)
+                plainChat.createdAt = new Date(plainChat.createdAt)
             }
-            console.log('plainChat:', plainChat)
+            // console.log('plainChat:', plainChat)
             return plainChat as Chat
         })
     } catch (error) {
@@ -69,7 +69,7 @@ export async function getChats(userId?: string | null) {
 }
 
 export async function getChat(id: string, userId: string) {
-    console.log('getChat:', id, userId)
+    // console.log('getChat:', id, userId)
     const redis = await getRedis()
     const chat: Chat = await redis.hgetall(`chat:${id}`) as Chat
 
@@ -92,7 +92,7 @@ export async function getChat(id: string, userId: string) {
         
     }
 
-    console.log('get chat result:', chat)
+    // console.log('get chat result:', chat)
 
     return chat
 }
@@ -100,7 +100,7 @@ export async function getChat(id: string, userId: string) {
 export async function clearChats(
     userId: string
 ): Promise<{ error?: string }> {
-    console.log('Clearing chats for user:', userId)
+    // console.log('Clearing chats for user:', userId)
     const redis = await getRedis()
     const userChatKey = getUserChatKey(userId)
     const chats = await redis.zrange(userChatKey, 0, -1)
@@ -158,7 +158,7 @@ export async function deleteChat(
 
 export async function saveChat(chat: Chat, userId: string) {
     try {
-        console.log('Saving chat:', userId, chat.id)
+        // console.log('Saving chat:', userId, chat.id)
         const redis = await getRedis()
         const pipeline = redis.pipeline()
 
@@ -171,7 +171,7 @@ export async function saveChat(chat: Chat, userId: string) {
         pipeline.zadd(getUserChatKey(userId), Date.now(), `chat:${chat.id}`)
 
         const results = await pipeline.exec()
-        console.log('result:', results)
+        // console.log('result:', results)
         return results
     } catch (error) {
         throw error

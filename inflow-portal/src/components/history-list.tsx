@@ -4,6 +4,7 @@ import { Chat } from 'inflow/lib/types';
 import { getChats } from 'inflow/lib/actions/chat';
 import { ClearHistory } from './clear-history';
 import { verifyCredential } from 'inflow/lib/dal';
+import { ANONYMOUS_USER_ID } from 'inflow/lib/constants';
 
 type HistoryListProps = {
   userId?: string
@@ -15,7 +16,10 @@ const loadChats = cache(async (userId?: string) => {
 
 // Start of Selection
 export async function HistoryList({ }: HistoryListProps) {
-  const {userId} = await verifyCredential();
+  const { userId } = await verifyCredential();
+  if (!userId || userId === ANONYMOUS_USER_ID) {
+    return null
+  }
   const chats = await getChats(userId)
 
   return (

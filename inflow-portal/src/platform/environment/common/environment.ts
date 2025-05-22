@@ -90,6 +90,10 @@ class Environment {
         return this.ENVIRONMENT === 'production';
     }
 
+    public get isChatHistoryEnabled() {
+        return this.toBoolean(process.env.ENABLE_SAVE_CHAT_HISTORY ?? 'false');
+    }
+
     //#region SMTP
 
     /**

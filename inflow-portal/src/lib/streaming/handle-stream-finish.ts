@@ -3,6 +3,7 @@ import { generateRelatedQuestions } from 'inflow/lib/agents/generate-related-que
 import { ExtendedCoreMessage } from 'inflow/lib/types'
 import { convertToExtendedCoreMessages } from 'inflow/lib/utils'
 import { CoreMessage, DataStreamWriter, JSONValue, Message } from 'ai'
+import { ANONYMOUS_USER_ID } from '../constants'
 
 interface HandleStreamFinishParams {
     userId: string;
@@ -67,7 +68,7 @@ export async function handleStreamFinish({
             ...responseMessages.slice(-1)
         ] as ExtendedCoreMessage[];
 
-        if (process.env.ENABLE_SAVE_CHAT_HISTORY !== 'true') {
+        if (process.env.ENABLE_SAVE_CHAT_HISTORY !== 'true' || userId === ANONYMOUS_USER_ID) {
             return;
         }
 
