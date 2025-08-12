@@ -1,4 +1,4 @@
-import { type i18n, createInstance } from 'i18next';
+import { type i18n, createInstance } from '../../../../node_modules/i18next';
 import resourcesToBackend from 'i18next-resources-to-backend';
 import { languages, unicodeCLDRtoBCP47 } from 'inflow/base/common/i18n';
 

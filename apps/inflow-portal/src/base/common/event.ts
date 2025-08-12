@@ -8,10 +8,10 @@ import { diffSets } from './collections.js';
 import { onUnexpectedError } from './errors.js';
 import { createSingleCallFunction } from './functional.js';
 import { combinedDisposable, Disposable, DisposableMap, DisposableStore, IDisposable, toDisposable } from './lifecycle.js';
-import { LinkedList } from './linkedList';
-import { IObservable, IObservableWithChange, IObserver } from './observable';
-import { StopWatch } from './stopwatch';
-import { MicrotaskDelay } from './symbols';
+import { LinkedList } from './linkedList.js';
+import { IObservable, IObservableWithChange, IObserver } from './observable.js';
+import { StopWatch } from './stopwatch.js';
+import { MicrotaskDelay } from './symbols.js';
 
 
 // -----------------------------------------------------------------------------------------------------------------------

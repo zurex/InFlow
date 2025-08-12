@@ -7,7 +7,7 @@ import * as nls from 'inflow/nls';
 import { toErrorMessage } from 'inflow/base/common/errorMessage';
 import { Emitter, Event } from '.inflow/base/common/event';
 import { hash } from '../../../base/common/hash.js';
-import { Disposable, IDisposable } from '../../../base/common/lifecycle';
+import { Disposable, IDisposable } from '../../../base/common/lifecycle.js';
 import { ResourceMap } from '../../../base/common/map.js';
 import { isWindows } from 'inflow/base/common/platform.js';
 import { joinPath } from 'inflow/base/common/resources';

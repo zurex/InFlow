@@ -12,7 +12,8 @@
         {
           "origin": "https://n"
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "name": "Mote",
     "slug": "mote",
