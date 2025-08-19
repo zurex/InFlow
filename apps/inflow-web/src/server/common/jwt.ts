@@ -42,9 +42,6 @@ export async function getUserForJWT(
 
     const user = await prisma.user.findUnique({
         where: { id: payload.id },
-        include: {
-            spaces: true,
-        }
     });
     if (!user) {
         throw AuthenticationError('Invalid token');
