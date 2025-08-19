@@ -52,7 +52,7 @@ async function createGuestUser() {
         ip: '',
         user: {
             name,
-            email: '',
+            email: `${name}@mote.dev`,
         },
         authenticationProvider: {
             name: 'guest',

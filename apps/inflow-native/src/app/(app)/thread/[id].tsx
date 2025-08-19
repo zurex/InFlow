@@ -9,7 +9,7 @@ export default function ThreadPage() {
     return (
         <SafeAreaView className="flex-1">
             <ReactNativeWebView
-                source={{ uri: `http://192.168.31.139:3000/chat/${id}`}}
+                source={{ uri: `https://ai.mote.dev/chat/${id}`}}
             />
         </SafeAreaView>
     );
