@@ -6,14 +6,14 @@ export const unstable_settings = {
 
 export default function AppLayout() {
   return (
-    <Stack>
-      <Stack.Screen name="(root)" />
-      <Stack.Screen
-        name="sign-in"
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="index" />
+      <Stack.Screen name="thread" />
+      <Stack.Screen 
+        name="ask"  
         options={{
           presentation: 'modal',
-        }}
-      />
+        }}/>
     </Stack>
   );
 }
