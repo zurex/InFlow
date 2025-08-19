@@ -1,5 +1,5 @@
 import { UseChatHelpers } from '@ai-sdk/react';
-import { ChatUIMessage } from 'inflow/ai/streaming/stream-common';
+import { ChatUIMessage } from 'inflow/ai/message';
 import { useScrollToBottom } from './use-scroll-to-bottom';
 import { useEffect, useState } from 'react';
 

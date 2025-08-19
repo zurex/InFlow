@@ -1,7 +1,7 @@
 import { UseChatHelpers } from '@ai-sdk/react';
-import { ChatUIMessage } from 'inflow/ai/streaming/stream-common';
 import { useMessages } from 'inflow/common/hooks/use-messages';
 import { PreviewMessage } from './message';
+import { ChatUIMessage } from 'inflow/ai/message';
 
 interface MessagesProps {
     chatId: string;

@@ -39,6 +39,7 @@ const components: Partial<Components> = {
                 className="text-blue-500 hover:underline"
                 target="_blank"
                 rel="noreferrer"
+                href={props.href || ''}
                 {...props}
             >
                 {children}
