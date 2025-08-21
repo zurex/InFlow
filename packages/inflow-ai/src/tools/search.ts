@@ -1,4 +1,4 @@
-import { type DeepPartial, tool } from 'ai';
+import { type DeepPartial, type InferUITool, tool } from 'ai';
 import { z } from 'zod';
 import { sanitizeUrl } from '../utils';
 
@@ -204,7 +204,7 @@ async function tavilySearch(
 export function createSearchTool(fullModel: string) {
     return tool({
         description: 'Search the web for information',
-        inputSchema: getSearchSchemaForModel(fullModel),
+        inputSchema: strictSearchSchema,
         execute: async ({
             query,
             max_results = 20,
@@ -258,4 +258,7 @@ export function createSearchTool(fullModel: string) {
             return searchResult
         }
     })
-}
+};
+
+const searchTools = createSearchTool('');
+export type SearchTool = InferUITool<typeof searchTools>;

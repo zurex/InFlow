@@ -4,6 +4,7 @@ import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { useRouter } from "expo-router";
 import { create } from 'zustand';
 import { generateId } from 'ai';
+import { generateUUID } from "inflow/lib/utils";
 
 interface AskStore {
     question: string;
@@ -70,7 +71,7 @@ function AskInput() {
 function AskTools() {
     const { top } = useSafeAreaInsets();
     const { question, clearQuestion } = useAskStore();
-    const id = generateId();
+    const id = generateUUID();
     const router = useRouter();
 
     const handleSubmit = () => {

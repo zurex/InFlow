@@ -34,16 +34,13 @@ export function createToolCallingStreamResponse(config: BaseStreamConfig) {
 
                 const result = streamText({
                     ...researcherConfig,
-                    onChunk: ({chunk}) => {
-                        console.log('Stream chunk:', chunk);
-                    },
                     onFinish: async result => {
                         await handleStreamFinish({
                             userId,
                             responseMessages: result.response.messages,
                             originalMessages: messages,
                             model,
-                            chatId,
+                            threadId: chatId,
                             writer,
                             skipRelatedQuestions: isReasoningModel(model)
                         });

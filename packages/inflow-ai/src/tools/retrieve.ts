@@ -1,6 +1,6 @@
 import { type DeepPartial, type InferUITool, tool } from 'ai';
 import { z } from 'zod';
-import type { SearchResults as SearchResultsType } from 'inflow/ai/tools/search';
+import type { SearchResults as SearchResultsType } from '@inflow/ai/tools/search';
 
 
 export const RetrieveSchema = z.object({

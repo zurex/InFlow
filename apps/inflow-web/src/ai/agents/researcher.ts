@@ -1,8 +1,9 @@
-import { ModelMessage, smoothStream, stepCountIs, streamText } from 'ai';
+import { ModelMessage, smoothStream, stepCountIs, streamText, wrapLanguageModel } from 'ai';
 import { getModel, ModelName } from 'inflow/ai/registry';
 import { createSearchTool } from 'inflow/ai/tools/search';
 import { retrieveTool } from 'inflow/ai/tools/retrieve';
 import { modelProvider } from '../providers';
+import { cacheMiddleware } from 'inflow/lib/middlewares';
 
 
 const SYSTEM_PROMPT = `
@@ -47,9 +48,14 @@ export function researcher({
     const currentDate = new Date().toLocaleString();
     
     const searchTool = createSearchTool(model);
+
+    const wrappedModel = wrapLanguageModel({
+        model: modelProvider.languageModel(model),
+        middleware: cacheMiddleware,
+    });
     
     return {
-        model: modelProvider.languageModel(model),
+        model: wrappedModel,
         system: `${SYSTEM_PROMPT}\nCurrent date and time: ${currentDate}`,
         messages,
         tools: {

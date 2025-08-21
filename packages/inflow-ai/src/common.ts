@@ -1,4 +1,5 @@
 import type { RetrieveTool } from './tools/retrieve';
+import type { SearchTool } from './tools/search';
 
 export type UIDataTypes = {
     textDelta: string;
@@ -22,4 +23,5 @@ export interface Attachment {
 
 export type ChatTools = {
     retrieve: RetrieveTool;
+    search: SearchTool;
 }

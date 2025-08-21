@@ -8,6 +8,7 @@ import { ChatUIMessage } from 'inflow/ai/message';
 import { createToolCallingStreamResponse } from 'inflow/ai/streaming/create-tool-calling-stream';
 import { Model, ModelName } from 'inflow/ai/registry';
 import { ChatModel } from 'inflow/ai/models';
+import { convertToModelMessages } from 'ai';
 
 export async function GET(req: Request) {
     return new Response('chat works');
@@ -20,7 +21,8 @@ export async function POST(request: Request) {
     try {
         const json = await request.json();
         requestBody = PostRequestBodySchema.parse(json);
-    } catch (_) {
+    } catch (error) {
+        console.error('Invalid request body:', error);
         return new ChatSDKError('bad_request:api').toResponse();
     }
 
@@ -33,13 +35,17 @@ export async function POST(request: Request) {
 
         const { 
             message, 
-            id: threadId,
+            id,
             selectedChatModel
         }: {
             id: string;
             message: ChatUIMessage;
             selectedChatModel: ChatModel['id']
         } = requestBody;
+
+        // Handle with hyphens (-) since Prisma return this format by default
+        const threadId = id.replaceAll('-', '');
+        const userId = user.id.replaceAll('-', '');
         const referer = request.headers.get('referer')
 
         const isSharePage = referer?.includes('/share/');
@@ -52,12 +58,29 @@ export async function POST(request: Request) {
 
         const cookieStore = await cookies();
         const searchMode = true;// cookieStore.get('search-mode')?.value === 'true';
+
+        let thread = await threadService.getThread(threadId);
+
+        if (!thread) {
+            console.log(`[ChatAPI] Try to creat thread <id=${threadId}, uid=${userId}>`)
+            await threadService.createThread({
+                id: threadId,
+                userId: userId,
+                title: message.parts.find(part=>part.type=='text')?.text || ''
+            });
+        }
         
         const messagesFromDb = await threadService.getMessages(threadId);
         const uiMessages = [...convertToUIMessages(messagesFromDb), message];
 
+        
+        await threadService.saveMessage(
+            threadId, 
+            convertToModelMessages([message])[0]
+        );
+
         return createToolCallingStreamResponse({
-            userId: user.id,
+            userId: userId,
             messages: uiMessages,
             model: selectedChatModel,
             chatId: threadId,

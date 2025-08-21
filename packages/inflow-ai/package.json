@@ -3,7 +3,18 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "exports": {
+    "./*": "./dist/*.js"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/*"
+      ]
+    }
+  },
   "scripts": {
+    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -12,6 +23,7 @@
   "packageManager": "pnpm@10.14.0",
   "devDependencies": {
     "@types/node": "^20.19.11",
+    "tsc-alias": "^1.8.16",
     "typescript": "^5.9.2"
   },
   "dependencies": {

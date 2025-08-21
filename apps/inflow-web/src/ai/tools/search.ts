@@ -204,7 +204,7 @@ async function tavilySearch(
 export function createSearchTool(fullModel: string) {
     return tool({
         description: 'Search the web for information',
-        inputSchema: getSearchSchemaForModel(fullModel),
+        inputSchema: strictSearchSchema,
         execute: async ({
             query,
             max_results = 20,
@@ -233,7 +233,7 @@ export function createSearchTool(fullModel: string) {
                     : effectiveSearchDepth || 'basic'
 
             console.log(
-                `Using search API: ${searchAPI}, Search Depth: ${effectiveSearchDepthForAPI}`
+                `[SearchTool] Search <query=${query}> with ${searchAPI}, Search Depth: ${effectiveSearchDepthForAPI}`
             )
 
             try {
@@ -244,31 +244,31 @@ export function createSearchTool(fullModel: string) {
                     const baseUrl =
                     process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
                     const response = await fetch(`${baseUrl}/api/advanced-search`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        query: filledQuery,
-                        maxResults: effectiveMaxResults,
-                        searchDepth: effectiveSearchDepthForAPI,
-                        includeDomains: include_domains,
-                        excludeDomains: exclude_domains
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            query: filledQuery,
+                            maxResults: effectiveMaxResults,
+                            searchDepth: effectiveSearchDepthForAPI,
+                            includeDomains: include_domains,
+                            excludeDomains: exclude_domains
+                        })
                     })
-                })
-                if (!response.ok) {
-                    throw new Error(
-                        `Advanced search API error: ${response.status} ${response.statusText}`
+                    if (!response.ok) {
+                        throw new Error(
+                            `Advanced search API error: ${response.status} ${response.statusText}`
+                        )
+                    }
+                    searchResult = await response.json()
+                } else {
+                    searchResult = await tavilySearch(
+                        filledQuery,
+                        effectiveMaxResults,
+                        effectiveSearchDepthForAPI,
+                        include_domains,
+                        exclude_domains
                     )
                 }
-                searchResult = await response.json()
-            } else {
-                searchResult = await tavilySearch(
-                    filledQuery,
-                    effectiveMaxResults,
-                    effectiveSearchDepthForAPI,
-                    include_domains,
-                    exclude_domains
-                )
-            }
             } catch (error) {
             console.error('Search API error:', error)
             searchResult = {

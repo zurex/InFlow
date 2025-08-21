@@ -3,13 +3,14 @@
   "compilerOptions": {
     // File Layout
     // "rootDir": "./src",
-    // "outDir": "./dist",
+    "outDir": "./dist",
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
     "module": "esnext",
     "target": "esnext",
-    "types": [],
+    "types": ["node"],
+    "lib": ["esnext", "dom"],
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
@@ -43,7 +44,7 @@
     "moduleResolution": "node",
 
     "paths": {
-      "inflow/ai/*": ["./src/*"]
+      "@inflow/ai/*": ["./src/*"]
     },    
   }
 }
