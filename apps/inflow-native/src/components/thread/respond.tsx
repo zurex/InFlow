@@ -1,6 +1,6 @@
 import { UseChatHelpers } from '@ai-sdk/react';
 import { BotUIMessage, ChatUIMessage } from '@inflow/ai/message';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Orchestration } from './orchestration';
 import Markdown from 'react-native-markdown-display';
 import { sanitizeText } from 'inflow/lib/utils';
@@ -25,7 +25,7 @@ export function Respond({
                 if (part.type === 'text') {
                     return (
                         <View key={index} className="p-4">
-                            <Markdown >
+                            <Markdown style={styles}>
                                 {sanitizeText(part.text)}
                             </Markdown> 
                         </View>
@@ -35,3 +35,10 @@ export function Respond({
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    text: {
+        paddingTop: 2,
+        paddingBottom: 2
+    }
+});

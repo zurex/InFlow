@@ -9,13 +9,17 @@ import { BaseStreamConfig } from './stream-common';
 import { researcher } from '../agents/researcher';
 import { getMaxAllowedTokens, truncateMessages } from '../utils';
 import { isReasoningModel } from '../registry';
-import { handleStreamFinish } from './handle-stream-finish';
+import { handleResponseFinish } from './handle-stream-finish';
 import { ChatUIMessage } from '../message';
+import { Thread } from '@prisma/client';
 
-export function createToolCallingStreamResponse(config: BaseStreamConfig) {
+export function createToolCallingStreamResponse(
+    thread: Thread, config: BaseStreamConfig
+) {
+    const { messages, model, chatId, userId, searchMode } = config;
+
     const stream = createUIMessageStream<ChatUIMessage>({
         execute:  ({ writer }) => {
-            const { messages, model, chatId, userId, searchMode } = config;
 
             try {
                 const modelMessages = convertToModelMessages(messages);
@@ -32,20 +36,7 @@ export function createToolCallingStreamResponse(config: BaseStreamConfig) {
                     searchMode
                 });
 
-                const result = streamText({
-                    ...researcherConfig,
-                    onFinish: async result => {
-                        await handleStreamFinish({
-                            userId,
-                            responseMessages: result.response.messages,
-                            originalMessages: messages,
-                            model,
-                            threadId: chatId,
-                            writer,
-                            skipRelatedQuestions: isReasoningModel(model)
-                        });
-                    }
-                });
+                const result = streamText(researcherConfig);
 
                 writer.merge(result.toUIMessageStream({sendReasoning: true}));
 
@@ -53,6 +44,14 @@ export function createToolCallingStreamResponse(config: BaseStreamConfig) {
                 console.error('Stream execution error:', error);
                 throw error;
             }
+        },
+        onFinish: async ({ messages, responseMessage }) => {
+            console.log('responseMessage:', responseMessage);
+            await handleResponseFinish({
+                thread,
+                messages,
+                responseMessage
+            });
         },
         onError: (error) => {
             console.error('Stream error:', error);

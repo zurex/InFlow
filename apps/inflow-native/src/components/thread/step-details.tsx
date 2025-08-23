@@ -1,5 +1,5 @@
 import { View, Text, Image } from 'react-native';
-import { SearchStep, useOrchestrationStore } from './thread-store';
+import { SearchStep, useOrchestrationStore } from '../../store/thread-store';
 
 export function StepDetails() {
     const { steps } = useOrchestrationStore();
@@ -19,7 +19,6 @@ function SearchStepSection({
 }: {step: SearchStep}) {
     return (
         <View className='flex gap-2 '>
-
             <Text>搜索</Text>
             <View className='flex-row gap-2 flex-wrap'>
                 <View className='p-2 pl-4 pr-4 rounded-lg' style={{backgroundColor: '#ece6e7'}}>

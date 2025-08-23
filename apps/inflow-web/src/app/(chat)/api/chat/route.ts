@@ -56,30 +56,25 @@ export async function POST(request: Request) {
             });
         }
 
-        const cookieStore = await cookies();
         const searchMode = true;// cookieStore.get('search-mode')?.value === 'true';
 
-        let thread = await threadService.getThread(threadId);
-
-        if (!thread) {
-            console.log(`[ChatAPI] Try to creat thread <id=${threadId}, uid=${userId}>`)
-            await threadService.createThread({
-                id: threadId,
-                userId: userId,
-                title: message.parts.find(part=>part.type=='text')?.text || ''
-            });
-        }
+        console.log(`[ChatAPI] Try to save thread <id=${threadId}, uid=${userId}>`)
+        // Force save thread(upsert) to make sure update updatedAt field.
+        const thread = await threadService.saveThread({
+            id: threadId,
+            userId: userId,
+            title: message.parts.find(part=>part.type=='text')?.text || ''
+        });
         
         const messagesFromDb = await threadService.getMessages(threadId);
         const uiMessages = [...convertToUIMessages(messagesFromDb), message];
 
-        
-        await threadService.saveMessage(
+        threadService.saveMessage(
             threadId, 
-            convertToModelMessages([message])[0]
+            message
         );
 
-        return createToolCallingStreamResponse({
+        return createToolCallingStreamResponse(thread, {
             userId: userId,
             messages: uiMessages,
             model: selectedChatModel,

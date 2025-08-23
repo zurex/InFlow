@@ -1,10 +1,11 @@
 import { Button, KeyboardAvoidingView, Platform, Pressable, SafeAreaView, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from '@react-native-vector-icons/ionicons';
-import { useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { create } from 'zustand';
 import { generateId } from 'ai';
 import { generateUUID } from "inflow/lib/utils";
+import { Suggestion, useSuggestedStore } from "inflow/store/suggested-store";
 
 interface AskStore {
     question: string;
@@ -54,6 +55,7 @@ function CloseAsk() {
 
 function AskInput() {
     const { setQuestion, question } = useAskStore();
+    
     return (
         <View className="flex shrink-0 min-h-32">
             <TextInput 
@@ -64,8 +66,40 @@ function AskInput() {
                 onChangeText={setQuestion}
                 className="w-full text-3xl/10 border-b border-gray-300 pb-2"
                 placeholder="随意提问 随意探索"/>
+            <SuggestedActions />
         </View>
     );
+}
+
+function SuggestedActions() {
+    const { actions } = useSuggestedStore();
+
+    const renderAction = (suggestion: Suggestion, idx: number) => {
+        const id = generateUUID();
+        const address = `/thread/${id}?query=${encodeURIComponent(suggestion.action)}`;
+        return (
+            <View className="pt-4">
+                <Link href={address}>
+                    <View className="flex-row items-center gap-2">
+                        <Ionicons 
+                            name='arrow-forward-outline'
+                            size={18}
+                            color={"#71717a"}
+                        />
+                        <Text className="text-zinc-500 text-lg">
+                            {suggestion.title} {suggestion.label}
+                        </Text>
+                    </View>
+                </Link>
+            </View>
+        )
+    }
+
+    return (
+        <View>
+            {actions.map(renderAction)}
+        </View>
+    )
 }
 
 function AskTools() {

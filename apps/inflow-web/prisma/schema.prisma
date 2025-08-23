@@ -45,6 +45,7 @@ model Thread {
   userId String  @db.Uuid
   user   User    @relation(fields: [userId], references: [id])
 
+  preview Json?
   messages ChatMessage[]
 }
 

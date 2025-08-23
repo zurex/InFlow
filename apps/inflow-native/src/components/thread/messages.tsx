@@ -38,6 +38,7 @@ export default function Messages({
                         message={message as UserUIMessage}
                     />
                 );
+            case 'tool':
             case 'assistant':
                 return (
                     <Respond 

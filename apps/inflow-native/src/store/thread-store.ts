@@ -1,16 +1,29 @@
-import { BotUIMessage } from '@inflow/ai/message';
+import { TextPart } from 'ai';
 import { create } from 'zustand';
 
+export type Thread = {
+    id: string;
+    title: string;
+    preview?: Array<TextPart>;
+    createdAt: Date;
+    updatedAt: Date;
+    messages?: any[];
+}
+
 interface ThreadStore {
-    showSteps: boolean;
+    stepsShown: boolean;
+    thread: Thread | null;
     displaySteps: () => void;
     dismissSteps: () => void;
+    setThread: (thread: Thread) => void;
 }
 
 export const useThreadStore = create<ThreadStore>((set) => ({
-    showSteps: false,
-    displaySteps: () => set({ showSteps: true}),
-    dismissSteps: () => set({ showSteps: false})
+    stepsShown: false,
+    thread: null,
+    displaySteps: () => set({ stepsShown: true}),
+    dismissSteps: () => set({ stepsShown: false}),
+    setThread: (thread) => set({ thread })
 }));
 
 export type Reference = {

@@ -1,0 +1,1 @@
+export const Endpoint = __DEV__ ? 'http://192.168.31.139:3000' : 'https://ai.mote.dev';

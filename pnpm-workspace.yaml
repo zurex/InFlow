@@ -1,9 +1,19 @@
 packages:
-  - 'apps/*'
-  - 'packages/*'
+  - apps/*
+  - packages/*
+
+catalog:
+  expo: ^53.0.20
+  prisma: latest
+  react: ^19.1.1
+  react-dom: ^19.1.1
+  react-native: ^0.81.0
+  typescript: latest
 
 catalogs:
   prisma:
     prisma: latest
+  react:
+    react: latest
   typescript:
     typescript: latest

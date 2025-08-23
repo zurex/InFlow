@@ -11,7 +11,7 @@ import Messages from './messages';
 import { Attachment } from '@inflow/ai/common';
 import { View, Text, SafeAreaView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useThreadStore } from './thread-store';
+import { useThreadStore } from '../../store/thread-store';
 import { StepDetails } from './step-details';
 
 interface ThreadProps {
@@ -78,15 +78,15 @@ export default function Thread({
 
     // ref
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-    const { showSteps, dismissSteps } = useThreadStore();
-
+    const { stepsShown, dismissSteps } = useThreadStore();
+    
     useEffect(()=>{
-        if (showSteps) {
+        if (stepsShown) {
             bottomSheetModalRef.current.present();
         } else {
             bottomSheetModalRef.current.dismiss();
         }
-    }, [showSteps])
+    }, [stepsShown])
 
     useEffect(() => {
         if (query && !hasAppendedQuery) {
@@ -119,8 +119,22 @@ export default function Thread({
                     ref={bottomSheetModalRef} 
                     onDismiss={dismissSteps}
                     backdropComponent={(props) => <BottomSheetBackdrop {...props} opacity={0.1}/>}
+                    style={{
+                        shadowColor: "#000",
+                        shadowOffset: {
+                            width: 0,
+                            height: 2,
+                        },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 3.84,
+
+                        elevation: 5
+                    }}
                 >
-                    <BottomSheetView className='pb-20 pl-4 pr-4'>
+                    <BottomSheetView 
+                        className='pb-20 pl-4 pr-4' 
+                       
+                    >
                         <StepDetails />
                     </BottomSheetView>
                 </BottomSheetModal>

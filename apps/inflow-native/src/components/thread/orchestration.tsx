@@ -2,7 +2,12 @@ import { BotUIMessage, ToolUIMessage } from '@inflow/ai/message';
 import { View, Text, Pressable } from 'react-native';
 import { ReactNode, useEffect, useState } from 'react';
 import { Ionicons } from '@react-native-vector-icons/ionicons';
-import { OrchestrationStep, Reference, SearchStep, useOrchestrationStore, useThreadStore } from './thread-store';
+import { 
+    OrchestrationStep, 
+    Reference, SearchStep, 
+    useOrchestrationStore, 
+    useThreadStore 
+} from 'inflow/store/thread-store';
 
 interface OrchestrationProps {
     threadId: string;
